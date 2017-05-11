@@ -2,6 +2,10 @@
 # Stats from http://www.iqcomparisonsite.com/iqtable.aspx. Can't find above 200, and
 # below 100 are feeble minds unworthy of consideration
 def iq(n):
+    if n > 202:
+        return 1
+    if n < 100:
+        return 0
     return {
         202: 99.9999999995,
         201: 99.9999999992,
@@ -106,6 +110,4 @@ def iq(n):
         102: 55.3035150084,
         101: 52.6576534466,
         100: 49.9999999782,
-        n > 202: 1,
-        n < 100: 0
     }[n]
