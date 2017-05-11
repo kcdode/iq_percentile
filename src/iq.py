@@ -1,4 +1,6 @@
 # This is the first time writing anything in Python. Please do not murder me and maybe suggest a better option
+# Stats from http://www.iqcomparisonsite.com/iqtable.aspx. Can't find above 200, and
+# below 100 are feeble minds unworthy of consideration
 def iq(n):
     return {
         202: 99.9999999995,
@@ -104,5 +106,6 @@ def iq(n):
         102: 55.3035150084,
         101: 52.6576534466,
         100: 49.9999999782,
-        n > 140 or n < 100: None
+        n > 202: 1,
+        n < 100: 0
     }[n]
