@@ -14,7 +14,7 @@ pat_2 = re.compile("[0-9]+\s?iq", re.IGNORECASE)
 
 
 def run_bot(r):
-    subreddit = r.subreddit("sdiofaiofjiofjiofoji")
+    subreddit = r.subreddit("SUBREDDIT HERE")
 
     for comment in subreddit.comments(limit=300000):
         text = str(comment.body)
