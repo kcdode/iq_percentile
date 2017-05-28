@@ -1,10 +1,15 @@
 import praw
 import re
-from src import iq
+import random
+from src import percentiles
+
+
+starters = ["Golly gee! ", "Wowza! ", "Sweet Butter Crumpets! ", "Gasp! ", "Sweet Baby Jesus! ",
+            "Incredible! ", "Holy Moly! ", "By Jove! ", "Gee Willikers! ", "Gazooks! "]
 
 # Feel free to suggest additional regex patterns to match
-# patterns = {"iq is/of xxx", "xxx iq"}
-patterns = {"iq (of|is) [0-9]+", "[0-9]+\s?iq"}
+# patterns = {"iq is/of xxx,xxx", "xxx,xxx iq"}
+patterns = {"iq (of|is) [0-9]+(,[0-9]+)?", "[0-9]+(,[0-9]+)?\s?iq"}
 
 # Running list of comment's I've already replied to. Manually CTRL-A-DEL'ed periodically
 file = open("repliedto.txt", "a")
@@ -17,9 +22,10 @@ def login():
 
 def run_bot(r, visited):
     subreddit = r.subreddit("iamverysmart")
-    num_posts = 9
+    num_posts = 20
 
     for submission in subreddit.hot(limit=num_posts):
+
         submission.comments.replace_more(limit=0)
         comment_list = submission.comments.list()
 
@@ -35,23 +41,26 @@ def run_bot(r, visited):
                     print(regex.group(0) + "\n" + text + "\n" + comment.permalink() + "\n\n")
 
                     # Lookup percentile from extracted the integer in the matched string
-                    percentile = iq.iq([int(s) for s in regex.group(0).split() if s.isdigit()][0])
-                    if percentile is 1:
-                        comment.reply("Wow! That's so smart I can't even find a percentile for it!"
-                                      "" + "\n\n ^^^code:https://github.com/kcdode/iq_percentile  "
-                                           "^^^^^I-am-still-in-testing-PM-me-if-I-fucked-up")
-                    elif percentile is 0:
-                        comment.reply("Wow! That IQ suggests a truly feeble mind!" +
+                    num = percentiles.get_iq_perc(int(re.findall("\d+,?\d+?", regex.group(0))[0]))
+                    if num is 1:
+                        comment.reply(random.choice(starters) + "That's so smart I can't even find a percentile for it!"
+                                      "\n\n ^^^code:https://github.com/kcdode/iq_percentile  "
+                                      "^^^^^I-am-still-in-testing-PM-me-if-I-fucked-up")
+                    elif num is 0:
+                        comment.reply(random.choice(starters) + "That IQ suggests a truly feeble mind!" +
                                       "\n\n ^^^code:https://github.com/kcdode/iq_percentile  "
                                       "^^^^^I-am-still-in-testing-PM-me-if-I-fucked-up")
                     else:
-                        comment.reply("Wow! That IQ is in the " + str(percentile) + "th percentile of people!" +
+                        comment.reply(random.choice(starters) + "That IQ is in the " + str(num) +
+                                      "th percentile of people!" +
                                       "\n\n ^^^code:https://github.com/kcdode/iq_percentile "
                                       "^^^I-am-still-in-testing-PM-me-if-I-fucked-up")
+
+
+                    # Add to list of already replied-to comments, so future exectuion won't reply again
                     file.write(comment.permalink())
                     file.write("\n")
 
 f = [line.rstrip() for line in open("repliedto.txt", "r")]
-#print(f)
 
 run_bot(login(), f)
