@@ -25,7 +25,6 @@ def run_bot(r, visited):
     num_posts = 20
 
     for submission in subreddit.hot(limit=num_posts):
-
         submission.comments.replace_more(limit=0)
         comment_list = submission.comments.list()
 
@@ -33,33 +32,37 @@ def run_bot(r, visited):
             # Make sure we don't comment twice
             if comment.permalink() in visited:
                 continue
-
-            for pattern in patterns:
-                text = str(comment.body)
-                regex = re.search(re.compile(pattern, re.IGNORECASE), text)
-                if regex:
-                    print(regex.group(0) + "\n" + text + "\n" + comment.permalink() + "\n\n")
-
-                    # Lookup percentile from extracted the integer in the matched string
-                    num = percentiles.get_iq_perc(int(re.findall("\d+,?\d+?", regex.group(0))[0]))
-                    if num is 1:
-                        comment.reply(random.choice(starters) + "That's so smart I can't even find a percentile for it!"
-                                      "\n\n ^^^code:https://github.com/kcdode/iq_percentile  "
-                                      "^^^^^I-am-still-in-testing-PM-me-if-I-fucked-up")
-                    elif num is 0:
-                        comment.reply(random.choice(starters) + "That IQ suggests a truly feeble mind!" +
-                                      "\n\n ^^^code:https://github.com/kcdode/iq_percentile  "
-                                      "^^^^^I-am-still-in-testing-PM-me-if-I-fucked-up")
-                    else:
-                        comment.reply(random.choice(starters) + "That IQ is in the " + str(num) +
-                                      "th percentile of people!" +
-                                      "\n\n ^^^code:https://github.com/kcdode/iq_percentile "
-                                      "^^^I-am-still-in-testing-PM-me-if-I-fucked-up")
+            reply_to_comment(comment)
 
 
-                    # Add to list of already replied-to comments, so future exectuion won't reply again
-                    file.write(comment.permalink())
-                    file.write("\n")
+def reply_to_comment(comment):
+    for pattern in patterns:
+        text = str(comment.body)
+        regex = re.search(re.compile(pattern, re.IGNORECASE), text)
+        if regex:
+            print(regex.group(0) + "\n" + text + "\n" + comment.permalink() + "\n\n")
+
+            # Lookup percentile from extracted the integer in the matched string
+            # Gets percentile of first number in regex group (will only be one by definition of the group patterns)
+            num = percentiles.get_iq_perc(int(re.findall("\d+,?\d+?", regex.group(0))[0]))
+            if num is 1:
+                comment.reply(random.choice(starters) + "That's so smart I can't even find a percentile for it!"
+                                                        "\n\n ^^^code:https://github.com/kcdode/iq_percentile  "
+                                                        "^^^^^I-am-still-in-testing-PM-me-if-I-fucked-up")
+            elif num is 0:
+                comment.reply(random.choice(starters) + "That IQ suggests a truly feeble mind!" +
+                              "\n\n ^^^code:https://github.com/kcdode/iq_percentile  "
+                              "^^^^^I-am-still-in-testing-PM-me-if-I-fucked-up")
+            else:
+                comment.reply(random.choice(starters) + "That IQ is in the " + str(num) +
+                              "th percentile of people!" +
+                              "\n\n ^^^code:https://github.com/kcdode/iq_percentile "
+                              "^^^I-am-still-in-testing-PM-me-if-I-fucked-up")
+
+            # Add to list of already replied-to comments, so future exectuion won't reply again
+            file.write(comment.permalink())
+            file.write("\n")
+
 
 f = [line.rstrip() for line in open("repliedto.txt", "r")]
 
