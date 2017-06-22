@@ -4,8 +4,8 @@ import random
 from scipy.stats import norm
 
 
-starters = ["Golly gee! ", "Wowza! ", "Sweet Butter Crumpets! ", "Gasp! ", "Sweet Baby Jesus! ",
-            "Incredible! ", "Holy Moly! ", "By Jove! ", "Gee Willikers! ", "Gazooks! "]
+starters = ["Golly Gee! ", "Wowza! ", "Sweet Butter Crumpets! ", "Gasp! ", "Sweet Baby Jesus! ",
+            "Incredible! ", "Holy Moly! ", "By Jove! ", "Gee Willikers! ", "Gazooks! ", "Aw Lordy!"]
 
 # Feel free to suggest additional regex patterns to match
 # patterns = {"iq is/of xxx", "xxx iq"}
@@ -49,17 +49,14 @@ def reply_to_comment(comment):
             num = norm.cdf((iq-100)/float(15))
             if num == 1:
                 comment.reply(random.choice(starters) + "That's so smart I can't even find a percentile for it!"
-                                                        "\n\n ^^^code:https://github.com/kcdode/iq_percentile  "
-                                                        "^^^^^I-am-still-in-testing-PM-me-if-I-fucked-up")
+                                                        "\n\n ^Code: ^https://github.com/kcdode/iq_percentile")
             elif num < 0.5:
                 comment.reply(random.choice(starters) + "That IQ suggests a truly feeble mind!" +
-                              "\n\n ^^^code:https://github.com/kcdode/iq_percentile  "
-                              "^^^^^I-am-still-in-testing-PM-me-if-I-fucked-up")
+                              "\n\n ^Code: ^https://github.com/kcdode/iq_percentile")
             else:
                 comment.reply(random.choice(starters) + "That IQ is in the " + str(num*100) +
                               "th percentile of people!" +
-                              "\n\n ^^^code:https://github.com/kcdode/iq_percentile "
-                              "^^^I-am-still-in-testing-PM-me-if-I-fucked-up")
+                              "\n\n ^Code: ^https://github.com/kcdode/iq_percentile")
 
             replied_to_write.write(comment.permalink())
             replied_to_write.write("\n")
