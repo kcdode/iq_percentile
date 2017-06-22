@@ -1,7 +1,7 @@
 import praw
 import re
 import random
-from src import percentiles
+from scipy.stats import norm
 
 
 starters = ["Golly gee! ", "Wowza! ", "Sweet Butter Crumpets! ", "Gasp! ", "Sweet Baby Jesus! ",
@@ -44,12 +44,13 @@ def reply_to_comment(comment):
 
             # Lookup percentile from extracted the integer in the matched string
             # Gets percentile of first number in regex group (will only be one by definition of the group patterns)
-            num = percentiles.get_iq_perc(int(re.findall("\d+,?\d+?", regex.group(0))[0]))
-            if num is 1:
+            iq = int(re.findall("\d+,?\d+?", regex.group(0))[0])
+            num = lambda iq: norm.cdf((iq-100)/float(15))
+            if num == 1:
                 comment.reply(random.choice(starters) + "That's so smart I can't even find a percentile for it!"
                                                         "\n\n ^^^code:https://github.com/kcdode/iq_percentile  "
                                                         "^^^^^I-am-still-in-testing-PM-me-if-I-fucked-up")
-            elif num is 0:
+            elif num < 0.5:
                 comment.reply(random.choice(starters) + "That IQ suggests a truly feeble mind!" +
                               "\n\n ^^^code:https://github.com/kcdode/iq_percentile  "
                               "^^^^^I-am-still-in-testing-PM-me-if-I-fucked-up")
