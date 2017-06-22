@@ -8,11 +8,13 @@ starters = ["Golly gee! ", "Wowza! ", "Sweet Butter Crumpets! ", "Gasp! ", "Swee
             "Incredible! ", "Holy Moly! ", "By Jove! ", "Gee Willikers! ", "Gazooks! "]
 
 # Feel free to suggest additional regex patterns to match
-# patterns = {"iq is/of xxx,xxx", "xxx,xxx iq"}
+# patterns = {"iq is/of xxx", "xxx iq"}
 patterns = {"iq (of|is) [0-9]+(,[0-9]+)?", "[0-9]+(,[0-9]+)?\s?iq"}
 
-# Running list of comment's I've already replied to. Manually CTRL-A-DEL'ed periodically
-file = open("repliedto.txt", "a")
+# Running list of comments (locally stored only) I've already replied to. Manually CTRL-A-DEL'ed periodically
+replied_to_write = open("repliedto.txt", "a")
+
+replied_to_read = [line.rstrip() for line in open("repliedto.txt", "r")]
 
 
 def login():
@@ -29,7 +31,6 @@ def run_bot(r, visited):
         comment_list = submission.comments.list()
 
         for comment in comment_list:
-            # Make sure we don't comment twice
             if comment.permalink() in visited:
                 continue
             reply_to_comment(comment)
@@ -42,10 +43,10 @@ def reply_to_comment(comment):
         if regex:
             print(regex.group(0) + "\n" + text + "\n" + comment.permalink() + "\n\n")
 
-            # Lookup percentile from extracted the integer in the matched string
-            # Gets percentile of first number in regex group (will only be one by definition of the group patterns)
+            # Calculate percentile from extracted the integer in the matched string
+            # Gets percentile of first number in regex group (there will only be one by definition of the pattern)
             iq = int(re.findall("\d+,?\d+?", regex.group(0))[0])
-            num = lambda iq: norm.cdf((iq-100)/float(15))
+            num = norm.cdf((iq-100)/float(15))
             if num == 1:
                 comment.reply(random.choice(starters) + "That's so smart I can't even find a percentile for it!"
                                                         "\n\n ^^^code:https://github.com/kcdode/iq_percentile  "
@@ -55,16 +56,13 @@ def reply_to_comment(comment):
                               "\n\n ^^^code:https://github.com/kcdode/iq_percentile  "
                               "^^^^^I-am-still-in-testing-PM-me-if-I-fucked-up")
             else:
-                comment.reply(random.choice(starters) + "That IQ is in the " + str(num) +
+                comment.reply(random.choice(starters) + "That IQ is in the " + str(num*100) +
                               "th percentile of people!" +
                               "\n\n ^^^code:https://github.com/kcdode/iq_percentile "
                               "^^^I-am-still-in-testing-PM-me-if-I-fucked-up")
 
-            # Add to list of already replied-to comments, so future exectuion won't reply again
-            file.write(comment.permalink())
-            file.write("\n")
+            replied_to_write.write(comment.permalink())
+            replied_to_write.write("\n")
 
 
-f = [line.rstrip() for line in open("repliedto.txt", "r")]
-
-run_bot(login(), f)
+run_bot(login(), replied_to_read)
