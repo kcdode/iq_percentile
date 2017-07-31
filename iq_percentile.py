@@ -5,11 +5,11 @@ from scipy.stats import norm
 
 
 starters = ["Golly Gee! ", "Wowza! ", "Sweet Butter Crumpets! ", "Gasp! ", "Sweet Baby Jesus! ",
-            "Incredible! ", "Holy Moly! ", "By Jove! ", "Gee Willikers! ", "Gazooks! ", "Aw Lordy!"]
+            "Incredible! ", "Holy Moly! ", "By Jove! ", "Gee Willikers! ", "Gazooks! ", "Aw Lordy! "]
 
 # Feel free to suggest additional regex patterns to match
 # patterns = {"iq is/of xxx", "xxx iq"}
-patterns = {"iq (of|is) [0-9]+(,[0-9]+)?", "[0-9]+(,[0-9]+)?\s?iq"}
+patterns = ["iq (of|is) [0-9]+(,[0-9]+)?", "[0-9]+(,[0-9]+)?\s?iq"]
 
 # Running list of comments (locally stored only) I've already replied to. Manually CTRL-A-DEL'ed periodically
 replied_to_write = open("repliedto.txt", "a")
@@ -45,9 +45,9 @@ def reply_to_comment(comment):
 
             # Calculate percentile from extracted the integer in the matched string
             # Gets percentile of first number in regex group (there will only be one by definition of the pattern)
-            iq = int(re.findall("\d+,?\d+?", regex.group(0))[0])
+            iq = int(re.findall("(\d+)(,\d+)?", regex.group(0))[0][0])  # ¯\_(ツ)_/¯
             num = norm.cdf((iq-100)/float(15))
-            if num == 1:
+            if num is 1:
                 comment.reply(random.choice(starters) + "That's so smart I can't even find a percentile for it!"
                                                         "\n\n ^Code: ^https://github.com/kcdode/iq_percentile")
             elif num < 0.5:
