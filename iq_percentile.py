@@ -8,12 +8,12 @@ starters = ["Golly Gee! ", "Wowza! ", "Sweet Butter Crumpets! ", "Gasp! ", "Swee
             "Incredible! ", "Holy Moly! ", "By Jove! ", "Gee Willikers! ", "Gazooks! ", "Aw Lordy! "]
 
 # Feel free to suggest additional regex patterns to match
-# patterns = {"iq is/of xxx", "xxx iq"}
+# patterns = ["iq is/of xxx", "xxx iq"]
 patterns = ["iq (of|is) [0-9]+(,[0-9]+)?", "[0-9]+(,[0-9]+)?\s?iq"]
 
 # Running list of comments (locally stored only) I've already replied to. Manually CTRL-A-DEL'ed periodically
-replied_to_write = open("repliedto.txt", "a")
 
+replied_to_write = open("repliedto.txt", "a")
 replied_to_read = [line.rstrip() for line in open("repliedto.txt", "r")]
 
 
@@ -43,8 +43,7 @@ def reply_to_comment(comment):
         if regex:
             print(regex.group(0) + "\n" + text + "\n" + comment.permalink() + "\n\n")
 
-            # Calculate percentile from extracted the integer in the matched string
-            # Gets percentile of first number in regex group (there will only be one by definition of the pattern)
+            # Find the number in matched group, run through
             iq = int(re.findall("(\d+)(,\d+)?", regex.group(0))[0][0])  # ¯\_(ツ)_/¯
             num = norm.cdf((iq-100)/float(15))
             if num is 1:
@@ -60,6 +59,18 @@ def reply_to_comment(comment):
 
             replied_to_write.write(comment.permalink())
             replied_to_write.write("\n")
+            return
+
+
+# Right now only checks for 'good bot,' may add more later if I see other common replies
+def check_replies(reddit):
+    for inbox_reply in reddit.inbox.unread(limit=None):
+        body = str(repr(inbox_reply.body))
+        regex = re.search(re.compile("good bot", re.IGNORECASE), body)
+        if regex:
+            print(body + str(inbox_reply.author))
+            inbox_reply.reply("[Thank You!](http://i.imgur.com/decjizU.png)")
 
 
 run_bot(login(), replied_to_read)
+check_replies(login())
