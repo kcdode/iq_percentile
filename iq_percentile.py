@@ -70,6 +70,7 @@ def check_replies(reddit):
         if regex:
             print(body + str(inbox_reply.author))
             inbox_reply.reply("[Thank You!](http://i.imgur.com/decjizU.png)")
+            reddit.inbox.mark_read([inbox_reply])
 
 
 run_bot(login(), replied_to_read)
